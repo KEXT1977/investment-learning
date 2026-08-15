@@ -54,7 +54,7 @@
         </button>
         <label>
           DeepSeek 模型
-          <input v-model.trim="model" type="text" autocomplete="off" placeholder="deepseek-chat" @change="persistModel">
+          <input v-model.trim="model" type="text" autocomplete="off" placeholder="deepseek-v4-flash" @change="persistModel">
         </label>
         <p>Key 与模型会保存在当前设备的浏览器中，刷新或重新打开网站后仍可恢复；网站不会上传 Key。仅在本人可信的设备上保存。</p>
       </details>
@@ -75,16 +75,32 @@
         <button class="chapter-ai-submit" type="button" :disabled="!canSubmit" @click="ask">
           {{ isLoading ? '正在思考…' : '发送问题' }}
         </button>
-        <button v-if="answer || error" class="chapter-ai-reset" type="button" :disabled="isLoading" @click="resetAnswer">
-          清空回答
+        <button v-if="conversation.length || answer || error" class="chapter-ai-reset" type="button" :disabled="isLoading" @click="clearConversation">
+          清空对话
         </button>
       </div>
 
       <p v-if="error" class="chapter-ai-error" role="alert">{{ error }}</p>
-      <article v-if="answer" class="chapter-ai-answer" aria-live="polite">
-        <h3>回答</h3>
-        <p>{{ answer }}</p>
-      </article>
+      <section v-if="conversation.length" class="chapter-ai-answer" aria-live="polite">
+        <header class="chapter-ai-answer-header">
+          <h3>对话记录（{{ conversation.length }} 条）</h3>
+          <button
+            class="chapter-ai-collapse"
+            type="button"
+            aria-controls="chapter-ai-thread"
+            :aria-expanded="isAnswerExpanded"
+            @click="isAnswerExpanded = !isAnswerExpanded"
+          >
+            {{ isAnswerExpanded ? '收起回答' : '展开回答' }}
+          </button>
+        </header>
+        <div v-if="isAnswerExpanded" id="chapter-ai-thread" class="chapter-ai-thread">
+          <article v-for="(message, index) in conversation" :key="`${message.role}-${index}`" class="chapter-ai-message" :class="`chapter-ai-message--${message.role}`">
+            <strong>{{ message.role === 'user' ? '你' : 'AI' }}</strong>
+            <p>{{ message.content }}</p>
+          </article>
+        </div>
+      </section>
 
       <p class="chapter-ai-disclaimer">DeepSeek 会接收课程内容与问题以生成回答。请勿输入账户、身份证、持仓明细等敏感信息。</p>
     </section>
@@ -95,7 +111,7 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { onContentUpdated, useData, useRoute } from 'vitepress'
 import { extractChapterText } from '../chapterContext'
-import { requestDeepSeekAnswer } from '../deepseekApi'
+import { type ConversationMessage, requestDeepSeekAnswer } from '../deepseekApi'
 
 const props = defineProps<{
   placement: 'aside' | 'mobile'
@@ -104,7 +120,7 @@ const props = defineProps<{
 const MAX_QUESTION_CHARS = 1500
 const API_KEY_STORAGE = 'investment-learning.deepseek-api-key'
 const MODEL_STORAGE = 'investment-learning.deepseek-model'
-const DEFAULT_MODEL = 'deepseek-chat'
+const DEFAULT_MODEL = 'deepseek-v4-flash'
 
 const { page } = useData()
 const route = useRoute()
@@ -115,7 +131,9 @@ const answer = ref('')
 const error = ref('')
 const isLoading = ref(false)
 const isOpen = ref(false)
+const isAnswerExpanded = ref(false)
 const chapterContent = ref('')
+const conversation = ref<ConversationMessage[]>([])
 
 const isCoursePage = computed(() => /^0[1-5]-/.test(page.value.relativePath))
 const chapterTitle = computed(() => page.value.title || '当前章节')
@@ -148,12 +166,18 @@ const clearApiKey = () => {
   if (typeof window !== 'undefined') {
     window.localStorage.removeItem(API_KEY_STORAGE)
   }
-  resetAnswer()
+  clearConversation()
 }
 
 const resetAnswer = () => {
   answer.value = ''
   error.value = ''
+}
+
+const clearConversation = () => {
+  conversation.value = []
+  isAnswerExpanded.value = false
+  resetAnswer()
 }
 
 const ask = async () => {
@@ -172,19 +196,32 @@ const ask = async () => {
     return
   }
 
+  const currentQuestion = question.value.trim()
+  const nextConversation = [
+    ...conversation.value,
+    { role: 'user' as const, content: currentQuestion }
+  ]
+
   persistApiKey()
   persistModel()
 
   isLoading.value = true
   try {
-    answer.value = await requestDeepSeekAnswer({
+    const nextAnswer = await requestDeepSeekAnswer({
       apiKey: apiKey.value,
       model: model.value,
       chapterTitle: chapterTitle.value,
       chapterPath: route.path,
       chapterContent: chapterContent.value,
-      question: question.value
+      conversation: nextConversation
     })
+    conversation.value = [
+      ...nextConversation,
+      { role: 'assistant', content: nextAnswer }
+    ]
+    answer.value = nextAnswer
+    question.value = ''
+    isAnswerExpanded.value = true
   } catch (requestError) {
     error.value = requestError instanceof Error ? requestError.message : '请求失败，请检查网络与 API Key 后重试。'
   } finally {
@@ -194,7 +231,7 @@ const ask = async () => {
 
 watch(() => route.path, () => {
   question.value = ''
-  resetAnswer()
+  clearConversation()
   void syncChapterContent()
 }, { flush: 'post' })
 
