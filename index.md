@@ -3,24 +3,24 @@ layout: home
 
 hero:
   name: 投资学习课程
-  text: 系统化的投资知识学习路径
-  tagline: 从零开始，建立完整的投资认知框架
+  text: 用 34 课建立完整的投资认知框架
+  tagline: 从市场基础到资产配置，按自己的节奏系统学习
   actions:
     - theme: brand
-      text: 开始学习
-      link: /课程总览
+      text: 从第一课开始
+      link: /01-市场基础认知/第01课-股票到底是什么
     - theme: alt
-      text: 市场基础认知
-      link: /01-市场基础认知/第一部分导读
+      text: 查看完整课程
+      link: /课程总览
 
 features:
-  - icon: 📈
-    title: 市场基础认知
-    details: 理解股票、基金、ETF的本质，掌握不同市场的特点
-  - icon: 🎯
-    title: 系统化学习
-    details: 循序渐进的课程设计，从基础到进阶逐步深入
+  - icon: 📚
+    title: 34 节系统课程
+    details: 围绕市场、风险、资产与配置展开，按顺序阅读即可建立完整框架
+  - icon: 🧭
+    title: 清晰的学习路径
+    details: 五个部分循序展开，每一课都可通过目录、上一篇和下一篇继续学习
   - icon: 💡
-    title: 实用导向
-    details: 理论结合实践，建立正确的投资思维框架
+    title: 面向真实决策
+    details: 用长期主义与风险意识，帮助你形成可执行的投资方法
 ---
