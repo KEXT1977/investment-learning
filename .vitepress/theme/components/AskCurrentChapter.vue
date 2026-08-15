@@ -54,9 +54,9 @@
         </button>
         <label>
           DeepSeek 模型
-          <input v-model.trim="model" type="text" autocomplete="off" placeholder="deepseek-chat">
+          <input v-model.trim="model" type="text" autocomplete="off" placeholder="deepseek-chat" @change="persistModel">
         </label>
-        <p>Key 只保存在当前浏览器会话中，不会上传到本站或 GitHub。</p>
+        <p>Key 与模型会保存在当前设备的浏览器中，刷新或重新打开网站后仍可恢复；网站不会上传 Key。仅在本人可信的设备上保存。</p>
       </details>
 
       <label class="chapter-ai-question">
@@ -132,14 +132,21 @@ const syncChapterContent = async () => {
 
 const persistApiKey = () => {
   if (typeof window !== 'undefined') {
-    window.sessionStorage.setItem(API_KEY_STORAGE, apiKey.value)
+    window.localStorage.setItem(API_KEY_STORAGE, apiKey.value)
+  }
+}
+
+const persistModel = () => {
+  if (typeof window !== 'undefined' && model.value) {
+    window.localStorage.setItem(MODEL_STORAGE, model.value)
   }
 }
 
 const clearApiKey = () => {
   apiKey.value = ''
+  question.value = ''
   if (typeof window !== 'undefined') {
-    window.sessionStorage.removeItem(API_KEY_STORAGE)
+    window.localStorage.removeItem(API_KEY_STORAGE)
   }
   resetAnswer()
 }
@@ -166,9 +173,7 @@ const ask = async () => {
   }
 
   persistApiKey()
-  if (typeof window !== 'undefined') {
-    window.sessionStorage.setItem(MODEL_STORAGE, model.value)
-  }
+  persistModel()
 
   isLoading.value = true
   try {
@@ -194,8 +199,8 @@ watch(() => route.path, () => {
 }, { flush: 'post' })
 
 onMounted(() => {
-  apiKey.value = window.sessionStorage.getItem(API_KEY_STORAGE) ?? ''
-  model.value = window.sessionStorage.getItem(MODEL_STORAGE) ?? DEFAULT_MODEL
+  apiKey.value = window.localStorage.getItem(API_KEY_STORAGE) ?? ''
+  model.value = window.localStorage.getItem(MODEL_STORAGE) ?? DEFAULT_MODEL
   void syncChapterContent()
 })
 
