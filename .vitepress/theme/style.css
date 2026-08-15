@@ -1,0 +1,228 @@
+.chapter-ai-panel {
+  margin: 0 0 18px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+}
+
+.chapter-ai-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 8px;
+}
+
+.chapter-ai-eyebrow {
+  margin: 0 0 4px;
+  color: var(--vp-c-brand-1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-ai-header h2,
+.chapter-ai-answer h3 {
+  margin: 0;
+  color: var(--vp-c-text-1);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.chapter-ai-context,
+.chapter-ai-disclaimer,
+.chapter-ai-settings p {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.chapter-ai-context,
+.chapter-ai-question,
+.chapter-ai-disclaimer,
+.chapter-ai-answer,
+.chapter-ai-actions {
+  margin-right: 16px;
+  margin-left: 16px;
+}
+
+.chapter-ai-context {
+  margin-bottom: 12px;
+}
+
+.chapter-ai-settings {
+  margin: 0 16px 12px;
+  border-top: 1px solid var(--vp-c-divider);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.chapter-ai-settings summary {
+  padding: 8px 0;
+  cursor: pointer;
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+}
+
+.chapter-ai-settings label,
+.chapter-ai-question {
+  display: grid;
+  gap: 6px;
+  color: var(--vp-c-text-1);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chapter-ai-settings label + label {
+  margin-top: 10px;
+}
+
+.chapter-ai-settings p {
+  margin: 10px 0;
+}
+
+.chapter-ai-settings input,
+.chapter-ai-question textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  outline: none;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font: inherit;
+}
+
+.chapter-ai-settings input {
+  padding: 7px 8px;
+}
+
+.chapter-ai-question textarea {
+  min-height: 88px;
+  resize: vertical;
+  padding: 8px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.chapter-ai-clear-key {
+  margin: 10px 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--vp-c-danger-1);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+}
+
+.chapter-ai-clear-key:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.chapter-ai-settings input:focus,
+.chapter-ai-question textarea:focus {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 0 0 2px var(--vp-c-brand-soft);
+}
+
+.chapter-ai-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chapter-ai-submit,
+.chapter-ai-reset,
+.chapter-ai-close,
+.chapter-ai-trigger {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chapter-ai-submit {
+  flex: 1;
+  padding: 9px 12px;
+  background: var(--vp-c-brand-1);
+  color: var(--vp-c-white);
+}
+
+.chapter-ai-reset,
+.chapter-ai-close {
+  padding: 9px 10px;
+  background: transparent;
+  color: var(--vp-c-text-2);
+}
+
+.chapter-ai-submit:disabled,
+.chapter-ai-reset:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.chapter-ai-error {
+  margin: 12px 16px 0;
+  color: var(--vp-c-danger-1);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.chapter-ai-answer {
+  margin-top: 14px;
+  border-top: 1px solid var(--vp-c-divider);
+  padding-top: 12px;
+}
+
+.chapter-ai-answer p {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.chapter-ai-disclaimer {
+  margin-top: 14px;
+  margin-bottom: 16px;
+}
+
+.chapter-ai-trigger,
+.chapter-ai-panel--mobile {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  .chapter-ai-trigger {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 40;
+    display: block;
+    padding: 11px 14px;
+    background: var(--vp-c-brand-1);
+    color: var(--vp-c-white);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
+  }
+
+  .chapter-ai-panel--mobile {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    z-index: 50;
+    display: block;
+    max-width: 560px;
+    margin: 0 auto;
+    max-height: min(720px, calc(100dvh - 24px));
+    overflow: auto;
+    box-shadow: 0 16px 48px rgb(0 0 0 / 24%);
+  }
+}
