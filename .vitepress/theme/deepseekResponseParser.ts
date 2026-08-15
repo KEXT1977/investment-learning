@@ -1,9 +1,22 @@
+import type { DeepSeekAnswerResult } from './deepseekApi'
+
 type ChatCompletionPayload = {
-  choices?: Array<{ message?: { content?: unknown } }>
+  choices?: Array<{
+    message?: { content?: unknown }
+    finish_reason?: string
+  }>
 }
 
-export const extractDeepSeekAnswer = (payload: unknown) => {
+const EMPTY_ANSWER: DeepSeekAnswerResult = { content: '', truncated: false }
+
+export const extractDeepSeekAnswer = (payload: unknown): DeepSeekAnswerResult => {
   const response = payload as ChatCompletionPayload
-  const content = response.choices?.[0]?.message?.content
-  return typeof content === 'string' ? content.trim() : ''
+  const choice = response.choices?.[0]
+  const content = choice?.message?.content
+  return {
+    content: typeof content === 'string' ? content.trim() : '',
+    truncated: choice?.finish_reason === 'length'
+  }
 }
+
+export { EMPTY_ANSWER }

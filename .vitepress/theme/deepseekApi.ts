@@ -24,6 +24,16 @@ const getErrorMessage = (status: number) => {
   return 'DeepSeek 暂时无法完成回答，请稍后重试。'
 }
 
+// DeepSeek 单次回答最大输出 token 数。
+// 官方文档上限：deepseek-chat 为 8192，deepseek-reasoner 为 64K。
+// 取 8192 对所有模型均合法，调大可避免长回答被截断。
+const MAX_RESPONSE_TOKENS = 8192
+
+export type DeepSeekAnswerResult = {
+  content: string
+  truncated: boolean
+}
+
 export const requestDeepSeekAnswer = async ({
   apiKey,
   model,
@@ -31,7 +41,7 @@ export const requestDeepSeekAnswer = async ({
   chapterPath,
   chapterContent,
   conversation
-}: AskDeepSeekOptions) => {
+}: AskDeepSeekOptions): Promise<DeepSeekAnswerResult> => {
   const [firstMessage, ...remainingMessages] = conversation
   const messages = firstMessage
     ? [
@@ -51,7 +61,7 @@ export const requestDeepSeekAnswer = async ({
     },
     body: JSON.stringify({
       model,
-      max_tokens: 500,
+      max_tokens: MAX_RESPONSE_TOKENS,
       messages: [
         { role: 'system', content: ROLE_INSTRUCTIONS },
         ...messages
@@ -61,5 +71,5 @@ export const requestDeepSeekAnswer = async ({
 
   const payload = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(getErrorMessage(response.status))
-  return extractDeepSeekAnswer(payload) || '没有获得可显示的回答，请换一种问法重试。'
+  return extractDeepSeekAnswer(payload)
 }
